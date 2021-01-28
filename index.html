@@ -33,16 +33,6 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <form id="gameForm" class="game-form">
-                <label for="firstname">Vardas</label>
-                <input type="text" name="firstname" maxlength="32" autocapitalize="words" placeholder="Vardas*" autofocus required>
-                <label for="firstname">Pavardė</label>
-                <input type="text" name="lastname" maxlength="32" autocapitalize="words" placeholder="Pavardė*" required>
-                <input type="submit" value="Pridėti žaidėją">
-                <input type="button" name="startGameBtn" value="Pradėti žaidimą">
-            </form>
-        </div>
         <div class="editing">
             <form id="pointsForm">
                 <select name="playersSelect">
@@ -51,6 +41,16 @@
                 <input type="number" name="points" step="1" value="1" required>
                 <input type="submit" value="Skirti taškus">
                 <input type="button" name="removePlayer" value="Pašalinti žaidėją">
+            </form>
+        </div>
+        <div>
+            <form id="gameForm" class="game-form">
+                <label for="firstname">Vardas</label>
+                <input type="text" name="firstname" maxlength="32" autocapitalize="words" placeholder="Vardas*" autofocus required>
+                <label for="firstname">Pavardė</label>
+                <input type="text" name="lastname" maxlength="32" autocapitalize="words" placeholder="Pavardė*" required>
+                <input type="submit" value="Pridėti žaidėją">
+                <input type="button" name="startGameBtn" value="Pradėti žaidimą">
             </form>
         </div>
         <div class="stats">
