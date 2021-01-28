@@ -75,13 +75,6 @@ class Player {
             this.points[round - 1] = 0
     }
 
-    removePoints(round, points) {
-        this.points[round - 1] -= points
-
-        if (this.points[round - 1] < 0)
-            this.points[round - 1] = 0
-    }
-
     setPoints(round, points) {
         this.points[round - 1] = points
 
