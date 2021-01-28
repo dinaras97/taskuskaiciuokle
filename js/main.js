@@ -29,12 +29,13 @@ class Game {
 
     removePlayer(player) {
         this.players = this.players.filter(p => p.firstname !== player.firstname && p.lastname !== player.lastname)
-        localStorage.setItem('players', this.players)
+        localStorage.setItem('players', JSON.stringify(this.players))
 
         if (this.players.length < 2) {
             this.round = 0
             localStorage.setItem('round', 0)
             this.players.map(player => player.points = [])
+            localStorage.setItem('players', JSON.stringify(this.players))
         }
     }
 
