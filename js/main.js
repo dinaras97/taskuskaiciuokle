@@ -1,16 +1,26 @@
 class Game {
     constructor() {
         this.players = []
-        this.round = 0
+
+        if (localStorage.getItem('players'))
+            JSON.parse(localStorage.getItem('players')).map(p => {
+                let player = new Player(p.firstname, p.lastname, p.points)
+                this.players.push(player)
+            })
+        
+        this.round = localStorage.getItem('round') || 0
     }
 
     newRound() {
         this.round++
         this.players.map(player => player.newRound())
+        localStorage.setItem('round', this.round)
+        localStorage.setItem('players', JSON.stringify(this.players))
     }
 
     addPlayer(player) {
         this.players.push(player)
+        localStorage.setItem('players', JSON.stringify(this.players))
 
         if (this.round !== 0)
             for (let i = 0; i < this.round; i++)
@@ -19,9 +29,11 @@ class Game {
 
     removePlayer(player) {
         this.players = this.players.filter(p => p.firstname !== player.firstname && p.lastname !== player.lastname)
+        localStorage.setItem('players', this.players)
 
         if (this.players.length < 2) {
             this.round = 0
+            localStorage.setItem('round', 0)
             this.players.map(player => player.points = [])
         }
     }
@@ -50,10 +62,10 @@ class Game {
 }
 
 class Player {
-    constructor(firstname, lastname) {
+    constructor(firstname, lastname, points = []) {
         this.firstname = firstname
         this.lastname = lastname
-        this.points = [ ]
+        this.points = points
     }
 
     addPoints(round, points) {
@@ -106,6 +118,10 @@ let roundTitle = document.querySelector('#roundTitle')
 let stats = document.querySelector('#stats')
 
 let game = new Game()
+renderPlayersList()
+renderPlayersSelect()
+renderRoundBtn()
+renderStats()
 
 gameForm.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -204,8 +220,10 @@ function playerExist(player) {
 }
 
 function addPoints(player, points) {
-    if (game.round > 0)
+    if (game.round > 0) {
         player.addPoints(game.round, points)
+        localStorage.setItem('players', JSON.stringify(game.players))
+    }
 }
 
 function renderPlayersList() {
