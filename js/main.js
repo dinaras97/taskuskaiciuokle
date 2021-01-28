@@ -19,6 +19,11 @@ class Game {
 
     removePlayer(player) {
         this.players = this.players.filter(p => p.firstname !== player.firstname && p.lastname !== player.lastname)
+
+        if (this.players.length < 2) {
+            this.round = 0
+            this.players.map(player => player.points = [])
+        }
     }
 
     sortPlayers() {
@@ -96,9 +101,11 @@ let gameForm = document.querySelector('#gameForm')
 let pointsForm = document.querySelector('#pointsForm')
 let gamePlayersList = document.querySelector('#gamePlayersList')
 let playersSelect = pointsForm.elements['playersSelect']
+let startGameBtn = gameForm.elements['startGameBtn']
+let roundTitle = document.querySelector('#roundTitle')
+let stats = document.querySelector('#stats')
 
 let game = new Game()
-game.newRound()
 
 gameForm.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -117,13 +124,29 @@ gameForm.addEventListener('submit', (e) => {
     gameForm.reset()
     renderPlayersList()
     renderPlayersSelect()
+    renderStats()
     gameForm.elements['firstname'].focus()
+})
+
+startGameBtn.addEventListener('click', () => {
+    if (game.players.length < 2)
+        return
+    
+    game.newRound()
+    
+    renderRoundBtn()
+    renderStats()
 })
 
 pointsForm.addEventListener('submit', (e) => {
     e.preventDefault()
     let points = pointsForm.elements['points'].value
-    let player = JSON.parse(playersSelect.value)
+    let player = playersSelect.value
+
+    if (!player)
+        return
+    
+    player = JSON.parse(player)
 
     if (!playersSelect.value || !points)
         return
@@ -140,24 +163,37 @@ pointsForm.addEventListener('submit', (e) => {
 
     addPoints(player, points)
     renderPlayersList()
+    renderStats()
     pointsForm.reset()
     location.href = "#header"
 })
 
 pointsForm.elements['removePlayer'].addEventListener('click', () => {
-    let player = JSON.parse(playersSelect.value)
+    let player = playersSelect.value
+
+    if (!player)
+        return
+    
+    player = JSON.parse(playersSelect.value)
     
     if (!player)
         return
 
     player = new Player(player.firstname, player.lastname)
 
+    if (!confirm(`Ar tikrai norite pašalinti žaidėją ${player.firstname} ${player.lastname}?`))
+        return
+
     game.removePlayer(player)
     renderPlayersList()
     renderPlayersSelect()
+    renderRoundBtn()
 })
 
 function playerExist(player) {
+    if (!player)
+        return
+    
     let existing = game.players.filter(p => p.firstname.toLowerCase() === player.firstname.toLowerCase()
         && p.lastname.toLowerCase() === player.lastname.toLowerCase())
 
@@ -188,10 +224,30 @@ function renderPlayersList() {
 }
 
 function renderPlayersSelect() {
-    playersSelect.innerHTML = ''
+    playersSelect.innerHTML = '<option value="" disabled selected>Pasirinkite žaidėją</option>'
 
     game.players.map(player => {
         playersSelect.innerHTML +=
             `<option value='${JSON.stringify({firstname: player.firstname, lastname: player.lastname})}'>${player.firstname} ${player.lastname}</option>`
+    })
+}
+
+function renderRoundBtn() {
+    roundTitle.innerText = `Raundas: ${game.round}`
+
+    if (game.round > 0)
+        startGameBtn.value = 'Naujas raundas'
+    else
+        startGameBtn.value = 'Naujas žaidimas'
+}
+
+function renderStats() {
+    stats.innerHTML = ''
+
+    game.players.map(player => {
+        stats.innerHTML +=
+        `
+            <li>${player.firstname} ${player.lastname} ${player.points}</li>
+        `
     })
 }
