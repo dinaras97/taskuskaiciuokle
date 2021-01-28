@@ -17,6 +17,10 @@ class Game {
                 player.newRound()
     }
 
+    removePlayer(player) {
+        this.players = this.players.filter(p => p.firstname !== player.firstname && p.lastname !== player.lastname)
+    }
+
     sortPlayers() {
         this.players.sort((a, b) => {
             if (a.lastname < b.lastname)
@@ -34,7 +38,7 @@ class Game {
         })
     }
 
-    info() {
+    leaderboard() {
         this.sortPlayers()
         return this.players
     }
@@ -49,6 +53,9 @@ class Player {
 
     addPoints(round, points) {
         this.points[round - 1] += points
+
+        if (this.points[round - 1] < 0)
+            this.points[round - 1] = 0
     }
 
     removePoints(round, points) {
@@ -85,41 +92,106 @@ class Player {
     }
 }
 
-let form = document.querySelector('#gameForm')
-let inputs = form.elements
+let gameForm = document.querySelector('#gameForm')
+let pointsForm = document.querySelector('#pointsForm')
 let gamePlayersList = document.querySelector('#gamePlayersList')
+let playersSelect = pointsForm.elements['playersSelect']
 
 let game = new Game()
+game.newRound()
 
-form.addEventListener('submit', (e) => {
+gameForm.addEventListener('submit', (e) => {
     e.preventDefault()
-    let firstname = inputs['firstname'].value
-    let lastname = inputs['lastname'].value
+    let firstname = gameForm.elements['firstname'].value
+    let lastname = gameForm.elements['lastname'].value
     
-    if (firstname && lastname && firstname.length <= 32 && lastname.length <= 32) {
-        let player = new Player(firstname, lastname)
-        if (!playerExist(player)) {
-            game.addPlayer(player)
-            form.reset()
-            updatePlayersList(player)
-        }
-    }
+    if (!firstname || !lastname || firstname.length > 32 || lastname.length > 32)
+        return
+    
+    let player = new Player(firstname, lastname)
+    
+    if (playerExist(player))
+        return
+    
+    game.addPlayer(player)
+    gameForm.reset()
+    renderPlayersList()
+    renderPlayersSelect()
+    gameForm.elements['firstname'].focus()
+})
+
+pointsForm.addEventListener('submit', (e) => {
+    e.preventDefault()
+    let points = pointsForm.elements['points'].value
+    let player = JSON.parse(playersSelect.value)
+
+    if (!playersSelect.value || !points)
+        return
+
+    points = parseInt(points)
+
+    if (points === 0)
+        return
+    
+    player = playerExist(new Player(player.firstname, player.lastname))
+
+    if (!player)
+        return
+
+    addPoints(player, points)
+    renderPlayersList()
+    pointsForm.reset()
+    location.href = "#header"
+})
+
+pointsForm.elements['removePlayer'].addEventListener('click', () => {
+    let player = JSON.parse(playersSelect.value)
+    
+    if (!player)
+        return
+
+    player = new Player(player.firstname, player.lastname)
+
+    game.removePlayer(player)
+    renderPlayersList()
+    renderPlayersSelect()
 })
 
 function playerExist(player) {
     let existing = game.players.filter(p => p.firstname.toLowerCase() === player.firstname.toLowerCase()
         && p.lastname.toLowerCase() === player.lastname.toLowerCase())
 
-    if (existing.length > 0)
-        return true
+    if (existing.length !== 0)
+        return existing[0]
     
     return false
 }
 
-function updatePlayersList(player) {
-    gamePlayersList.innerHTML = ''
+function addPoints(player, points) {
+    if (game.round > 0)
+        player.addPoints(game.round, points)
+}
 
-    game.info().map(player => {
-        gamePlayersList.innerHTML += `<li>${player.firstname} ${player.lastname} ${player.calculatePoints()}</li>`
+function renderPlayersList() {
+    gamePlayersList.innerHTML = ''
+    let number = 1;
+
+    game.leaderboard().map(player => {
+        gamePlayersList.innerHTML +=
+            `<tr>
+                <td>${number++}</td>
+                <td>${player.firstname}</td>
+                <td>${player.lastname}</td>
+                <td>${player.calculatePoints()}</td>
+            </tr>`
+    })
+}
+
+function renderPlayersSelect() {
+    playersSelect.innerHTML = ''
+
+    game.players.map(player => {
+        playersSelect.innerHTML +=
+            `<option value='${JSON.stringify({firstname: player.firstname, lastname: player.lastname})}'>${player.firstname} ${player.lastname}</option>`
     })
 }

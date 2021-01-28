@@ -10,22 +10,44 @@
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <h2>
+        <header class="header" id="header">
+            <h1>
                 Taškų Skaičiuoklė
-            </h2>
+            </h1>
         </header>
+        <div class="leaderboard">
+            <h2>
+                Leaderboard
+            </h2>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Vieta</th>
+                        <th>Vardas</th>
+                        <th>Pavardė</th>
+                        <th>Taškai</th>
+                    </tr>
+                </thead>
+                <tbody id="gamePlayersList">
+                </tbody>
+            </table>
+        </div>
         <div>
-            <form id="gameForm">
+            <form id="gameForm" class="game-form">
                 <label for="firstname">Vardas</label>
-                <input type="text" name="firstname" id="firstnameInput" maxlength="32" required>
+                <input type="text" name="firstname" maxlength="32" autocapitalize="words" placeholder="Vardas*" autofocus required>
                 <label for="firstname">Pavardė</label>
-                <input type="text" name="lastname" id="lastnameInput" maxlength="32" required>
+                <input type="text" name="lastname" maxlength="32" autocapitalize="words" placeholder="Pavardė*" required>
                 <input type="submit" value="Pridėti žaidėją">
             </form>
         </div>
-        <div>
-            <ul id="gamePlayersList"></ul>
+        <div class="editing">
+            <form id="pointsForm">
+                <select name="playersSelect"></select>
+                <input type="number" name="points" step="1" value="1" required>
+                <input type="submit" value="Skirti taškus">
+                <input type="button" name="removePlayer" value="Pašalinti žaidėją">
+            </form>
         </div>
     </div>
 </body>
